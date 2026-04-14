@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Task{% endblock %}
+
+{% block body %}
+<div class="max-w-2xl mx-auto mt-16 px-4">
+    
+    <div class="relative bg-white p-8 sm:p-10 rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        
+        <div class="flex items-center gap-4 mb-2">
+            <div class="p-2.5 bg-gray-50 rounded-xl text-gray-700 border border-gray-200 shadow-sm">
+                <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-6 h-6">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier"> 
+                        <path d="M13 0L16 3L9 10H6V7L13 0Z" fill="currentColor"></path> 
+                        <path d="M1 1V15H15V9H13V13H3V3H7V1H1Z" fill="currentColor"></path> 
+                    </g>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Edit Task</h1>
+        </div>
+        
+        <p class="text-gray-500 mb-8 ml-1">Update the details for "<span class="font-bold text-gray-900">{{ task.title }}</span>".</p>
+
+        {{ form_start(form) }}
+            
+            <div class="space-y-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-50">
+                {{ form_row(form.title) }}
+                {{ form_row(form.description) }}
+                
+                <div class="mt-4 pt-2 border-t border-gray-200/60">
+                    {{ form_label(form.status) }}
+                    
+                    <div class="flex flex-wrap gap-4 mt-3">
+                        {% for child in form.status %}
+                            
+                            {% set badge_color = 'bg-gray-100 text-gray-600 border-gray-200 peer-checked:bg-gray-800 peer-checked:text-white peer-checked:border-gray-800' %} 
+                            
+                            {% if child.vars.value == 'in_progress' %}
+                                {% set badge_color = 'bg-yellow-100 text-yellow-700 border-yellow-200 peer-checked:bg-yellow-500 peer-checked:text-white peer-checked:border-yellow-500' %}
+                            {% elseif child.vars.value == 'done' %}
+                                {% set badge_color = 'bg-green-100 text-green-700 border-green-200 peer-checked:bg-green-600 peer-checked:text-white peer-checked:border-green-600' %}
+                            {% endif %}
+
+                            <label class="cursor-pointer relative">
+                                {{ form_widget(child, {'attr': {'class': 'peer sr-only'}}) }}
+                                
+                                <div class="rounded-full px-5 py-2.5 text-xs font-black uppercase tracking-wider border shadow-sm transition-all duration-200 {{ badge_color }}">
+                                    {{ child.vars.label }}
+                                </div>
+                            </label>
+                            
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex items-center gap-4 pt-2">
+                {{ form_widget(form.save, {'label': 'Update Task'}) }}
+                
+                <a href="{{ path('app_task') }}" class="inline-flex items-center justify-center px-6 py-2.5 font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 hover:text-gray-900 rounded-lg transition-all duration-200">
+                    Cancel
+                </a>
+            </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</div>
+{% endblock %}

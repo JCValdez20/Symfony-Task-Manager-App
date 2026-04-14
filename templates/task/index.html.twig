@@ -1,0 +1,138 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Task Lists{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto px-6 py-12">
+    
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
+        
+        <div>
+            <h1 class="flex items-center gap-3 text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-10 h-10 sm:w-12 sm:h-12">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
+                
+                Task Lists
+            </h1>
+            <p class="mt-2 text-sm text-gray-500 font-medium">Manage your daily goals and stay organized.</p>
+        </div>
+        
+        <a href="{{ path('app_task_new') }}" class="group inline-flex items-center gap-2 px-6 py-3 text-white bg-gray-900 rounded-xl font-semibold shadow-md hover:bg-black hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 transition-transform duration-300 group-hover:rotate-90">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Add Task
+        </a>
+    </div>
+    
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+        
+        <table class="w-full text-left border-collapse">
+            
+            <thead class="bg-gray-50/80 text-gray-500 text-xs uppercase tracking-wider">
+                <tr>
+                    <th class="px-6 py-5 border-b border-gray-100 font-black">Title</th>
+                    <th class="px-6 py-5 border-b border-gray-100 font-black">Status</th>
+                    <th class="px-6 py-5 border-b border-gray-100 font-black">Created Date</th>
+                    <th class="px-6 py-5 border-b border-gray-100 text-right font-black">Actions</th>
+                </tr>
+            </thead>
+            
+            <tbody class="divide-y divide-gray-100">
+                {% for task in tasks %}
+                <tr class="hover:bg-gray-50/80 transition-colors duration-200 group">
+                    
+                    <td class="px-6 py-5 text-gray-900 font-bold text-base">{{ task.title }}</td>
+                    
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        {% set badge_color = 'bg-gray-100 text-gray-800 border-gray-200' %} 
+                        
+                        {% if task.status.value == 'pending' %}
+                            {% set badge_color = 'bg-gray-100 text-gray-800 border-gray-200' %}
+                        {% elseif task.status.value == 'in_progress' %}
+                            {% set badge_color = 'bg-yellow-100 text-yellow-800 border-yellow-200' %}
+                        {% elseif task.status.value == 'done' %}
+                            {% set badge_color = 'bg-green-100 text-green-800 border-green-200' %}
+                        {% endif %}
+
+                        <span class="{{ badge_color }} inline-block px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border shadow-sm">
+                            {{ task.status.value|replace({'_': ' '}) }}
+                        </span>
+                    </td>
+                    
+                    <td class="px-6 py-5 text-sm text-gray-400 font-medium whitespace-nowrap">
+                        {{ task.createdAt|date('M d, Y') }}
+                    </td>
+                    
+                    <td class="px-6 py-5 flex justify-end items-center gap-2">
+                        
+                        <a href="{{ path('task_edit', {'id': task.id}) }}" 
+                           title="Edit Task"
+                           class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 shadow-sm hover:bg-blue-600 hover:border-blue-600 hover:text-white hover:shadow-md hover:shadow-blue-200 hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                            </svg>
+                        </a>
+                        
+                        <button type="button" 
+                                title="Delete Task"
+                                onclick="document.getElementById('modal-delete-{{ task.id }}').classList.remove('hidden')" 
+                                class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-red-50 border border-red-100 text-red-600 shadow-sm hover:bg-red-600 hover:border-red-600 hover:text-white hover:shadow-md hover:shadow-red-200 hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </button>
+
+                        <div id="modal-delete-{{ task.id }}" class="hidden fixed inset-0 bg-gray-900/40 backdrop-blur-sm overflow-y-auto h-full w-full z-50 flex items-center justify-center text-left">
+                            <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border border-gray-100">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="p-2 bg-red-50 text-red-600 rounded-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        </svg>
+                                    </div>
+                                    <h2 class="text-2xl font-bold text-gray-900">Delete Task</h2>
+                                </div>
+                                <p class="text-gray-500 mb-8 whitespace-normal text-base">
+                                    Are you sure you want to delete <span class="font-bold text-gray-900">"{{ task.title }}"</span>? This action cannot be undone.
+                                </p>
+                                <div class="flex justify-end gap-3">
+                                    <button type="button" onclick="document.getElementById('modal-delete-{{ task.id }}').classList.add('hidden')" class="px-5 py-2.5 font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                                        Cancel
+                                    </button>
+                                    <form method="post" action="{{ path('task_delete', {'id': task.id}) }}" class="m-0">
+                                        <button type="submit" class="px-5 py-2.5 font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors shadow-sm">
+                                            Yes, Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </td>
+                </tr>
+                
+                {% else %}
+                
+                <tr>
+                    <td colspan="4" class="px-6 py-20 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="bg-gray-50 p-4 rounded-full mb-4 border border-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-gray-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V8.25H8.25m0 0h.375" />
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-extrabold text-gray-900 mb-1">No tasks found</h3>
+                            <p class="text-gray-500 mb-6 max-w-sm font-medium">You've cleared everything off your plate! Click the "Add Task" button to get started.</p>
+                        </div>
+                    </td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
